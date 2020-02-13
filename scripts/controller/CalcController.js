@@ -10,6 +10,7 @@ class CalcController {
         this._hourEl = document.querySelector('#hora');
         this._displayCalc;
         this._currentDate;
+        this._operation = [];
         this.initialize();
         this.initButtonsEvents();
 
@@ -33,13 +34,136 @@ class CalcController {
        });
     }
 
+    clearAll(){
+        this._operation = [];
+    }
+
+    cancelEntre(){
+
+        this._operation.pop();
+    }
+
+    lastOperation(){
+        return this._operation[this._operation.length-1];
+    }
+
+    setLastOperation(value){
+        this._operation[this._operation.length - 1] = value;
+    }
+
+    isOperator(value){
+
+        return (['+', '-', '*', '/', '%', '.'].indexOf(value) > -1);
+    }
+
+    isNumber(value){
+        return ([1, 2, 3, 4, 5, 6, 7, 8, 9, 0].indexOf(value)  > -1);
+    }
+
+    addOperation(value){  
+        
+        if(this._operation.length > 0){
+            if(isNaN(this.lastOperation())){
+                if(this.isOperator(value)){
+                    this._operation[this._operation.length-1] = value;
+                    console.log(this._operation);
+                } else if(this.isNumber(value)){
+                    this._operation.push(value);
+                    console.log(this._operation);
+                }   
+            
+            } else if(this.isNumber(value)){
+                let newValue = this.lastOperation().toString() + value.toString();
+                this.setLastOperation(parseInt(newValue));
+                console.log(this._operation);
+            } else if(this.isOperator(value)){
+                this._operation.push(value);
+                console.log(this._operation);
+            }
+        } else {
+            this._operation.push(value);
+            console.log(this._operation);
+        }
+        
+        
+    }
+
+    setError(){
+
+        this.displayCalc = "Error";
+    }
+
+    execBtn(value){
+
+        switch(value){
+
+            case 'ac':
+                this.clearAll();
+            break; 
+
+            case 'ce':
+                this.cancelEntre();
+            break;
+
+            case 'soma':
+                this.addOperation('+');
+            break;
+
+            case 'subtracao':
+                this.addOperation('-');
+            break;
+
+            case 'divisao':
+                this.addOperation('/');
+            break;
+
+            case 'multiplicacao':
+                this.addOperation('*');
+            break;
+
+            case 'porcento':
+                this.addOperation('%');
+            break;
+
+            case 'igual':
+                
+            break;
+
+            case 'ponto':
+                this.addOperation('.');
+            break
+
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                
+                this.addOperation(parseInt(value));
+                 
+            break;
+
+
+            default:
+                this.setError();
+            break;
+        }
+    }
+
     initButtonsEvents(){
 
         let buttons = document.querySelectorAll("#buttons > g, #parts > g");
 
         buttons.forEach((btn, index)=>{
             this.addEventListenerAll(btn, 'click drag', (e) => {
-                console.log(btn);
+                let textBtn = btn.className.baseVal.replace("btn-","");
+                
+                this.execBtn(textBtn);
             });
 
             this.addEventListenerAll(btn, "mouseover mouseup mousedown", e=>{
